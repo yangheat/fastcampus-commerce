@@ -10,6 +10,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@notionhq/client": "^2.2.15",
     "next": "14.2.3",
     "react": "^18",
