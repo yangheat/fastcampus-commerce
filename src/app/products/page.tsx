@@ -1,79 +1,79 @@
 'use client'
-
+import axios from 'axios'
 import Image from 'next/image'
-import { Carousel, SlideHandle } from 'nuka-carousel'
-import { useRef } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+type PRODUCT = {
+  id: number
+  content: string
+  price: number
+  created_at: string
+  category_id: number
+}
+
+const CATEGORY: { [key: string]: string } = {
+  1: '의류',
+  2: '의류2',
+  3: '의류3'
+}
+
+const TAKE = 8
 
 export default function Page() {
-  const ref = useRef<SlideHandle>(null)
-  const images = [
-    {
-      original: 'https://picsum.photos/id/1015/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1015/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1016/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1016/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1018/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1018/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1019/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1019/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1020/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1020/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1021/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1021/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1022/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1022/250/150/'
-    },
-    {
-      original: 'https://picsum.photos/id/1023/1000/600/',
-      thumbnail: 'https://picsum.photos/id/1023/250/150/'
-    }
-  ]
+  const [products, setProducts] = useState<PRODUCT[]>([])
+  const [page, setPage] = useState({ start: 0, end: TAKE })
+
+  useEffect(() => {
+    axios
+      .get(`/api/products?start=${page.start}&end=${page.end}`)
+      .then((result) => setProducts(result.data.product))
+      .catch((error) => console.error(error))
+  }, [])
+
+  const handleSeeMore = useCallback(() => {
+    const nextStart = page.end + 1
+    const nextEnd = nextStart + TAKE
+
+    axios
+      .get(`/api/products?start=${nextStart}&end=${nextEnd}`)
+      .then((result) => {
+        setProducts([...products, ...result.data.product])
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+
+    setPage({ start: nextStart, end: nextEnd })
+  }, [products, page])
 
   return (
-    <>
-      <Carousel showArrows autoplay={true} wrapMode="wrap" ref={ref}>
-        {images.map((image) => (
-          <Image
-            key={image.original}
-            src={image.original}
-            alt="Picture of the author"
-            sizes="100vw"
-            style={{
-              width: '100%',
-              height: 'auto'
-            }}
-            width={1000}
-            height={600}
-          />
-        ))}
-      </Carousel>
-      <div className="flex overflow-x-auto">
-        {images.map((image, index) => (
-          <div key={index}>
+    <main className="grid grid-cols-3 px-32 my-32 gap-5">
+      {products.map(
+        ({ id, content, price, created_at, category_id }: PRODUCT) => (
+          <div key={id}>
             <Image
-              src={image.thumbnail}
-              alt="Picture of the author"
-              width={250}
-              height={150}
-              onClick={() => {
-                ref.current?.goToPage(index)
-              }}
+              className="rounded"
+              src={`https://picsum.photos/id/${id}/300/200`}
+              alt="image"
+              width={300}
+              height={200}
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
             />
+            <div className="flex justify-between">
+              <span>{id}</span>
+              <span>{price}원</span>
+            </div>
+            <span className="text-zinc-400">{CATEGORY[category_id]}</span>
           </div>
-        ))}
-      </div>
-    </>
+        )
+      )}
+      <button
+        className="w-full mt-2 col-span-3 bg-zinc-200 p-4 rounded"
+        onClick={handleSeeMore}
+      >
+        더보기
+      </button>
+    </main>
   )
 }
