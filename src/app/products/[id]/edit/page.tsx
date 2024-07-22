@@ -59,7 +59,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then((result) => {
         setEditorState(
           EditorState.createWithContent(
-            convertFromRaw(JSON.parse(result.data.content))
+            convertFromRaw(JSON.parse(result.data.contents))
           )
         )
       })
@@ -69,7 +69,7 @@ export default function Page({ params }: { params: { id: string } }) {
   function handleSave() {
     axios.post('/api/products', {
       id: params.id,
-      content: convertToRaw(editorState.getCurrentContent())
+      contents: convertToRaw(editorState.getCurrentContent())
     })
   }
 

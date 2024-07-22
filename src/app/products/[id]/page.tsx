@@ -62,7 +62,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .then((result) => {
         setEditorState(
           EditorState.createWithContent(
-            convertFromRaw(JSON.parse(result.data.content))
+            convertFromRaw(JSON.parse(result.data.contents))
           )
         )
       })

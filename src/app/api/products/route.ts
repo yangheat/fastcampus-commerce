@@ -49,18 +49,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json()
   const id = body.id
-  const content = body.content
+  const contents = body.contents
 
   if (!id) {
     return NextResponse.json({ error: 'No id' }, BAD_REQUEST)
   }
 
-  if (!content) {
-    return NextResponse.json({ error: 'No content' }, BAD_REQUEST)
+  if (!contents) {
+    return NextResponse.json({ error: 'No contents' }, BAD_REQUEST)
   }
 
   try {
-    const { data, error } = await PRODUCTS.upsert({ id, content })
+    const { data, error } = await PRODUCTS.upsert({ id, contents })
 
     if (error) throw error
 
