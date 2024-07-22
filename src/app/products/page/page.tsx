@@ -28,7 +28,7 @@ export default function Page() {
       .then((result) => {
         const data = result.data
         setProducts(data.product)
-        setTotalPage(data.total / TAKE)
+        setTotalPage(Math.ceil(data.total / TAKE))
       })
       .catch((error) => console.error(error))
   }, [activePage])
