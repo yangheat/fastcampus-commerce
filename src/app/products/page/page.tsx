@@ -17,6 +17,7 @@ export default function Page() {
   const [activePage, setPage] = useState(1)
   const [totalPage, setTotalPage] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState<String | null>(null)
 
   /** 페이징 계산식
    * start: (n-1) * 9
@@ -34,6 +35,10 @@ export default function Page() {
       url += `&category=${categoryIndex + 1}`
     }
 
+    if (filter) {
+      url += `&filter=${filter}`
+    }
+
     axios
       .get(url)
       .then((result) => {
@@ -43,11 +48,11 @@ export default function Page() {
         setLoading(false)
       })
       .catch((error) => console.error(error))
-  }, [activePage, category])
+  }, [activePage, category, filter])
 
   return (
     <main className="my-32">
-      <section className="flex mb-5">
+      <section className="flex justify-between mb-5 mx-5">
         <SegmentedControl
           value={category}
           onChange={(curr) => {
@@ -55,7 +60,12 @@ export default function Page() {
             setCategory(curr)
           }}
           data={['All', ...CATEGORY_MAP]}
-          className="m-auto"
+        />
+        <Select
+          placeholder="Filter"
+          data={FILTERS}
+          onChange={setFilter}
+          clearable
         />
       </section>
       <PostList products={products} loading={loading} />

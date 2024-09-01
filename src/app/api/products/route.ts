@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   const start = searchParams.get('start')
   const end = searchParams.get('end')
   const category = searchParams.get('category')
+  const filter = searchParams.get('filter')
 
   const PRODUCTS = supabase.from('products')
   let query
@@ -26,11 +27,25 @@ export async function GET(request: NextRequest) {
     )
   } else {
     // id 검색
-    query = PRODUCTS.select().eq('id', id).single()
+    query = PRODUCTS.select().eq('id', id)
   }
 
   if (category) {
-    query = PRODUCTS.select().eq('category_id', Number(category))
+    query = query.eq('category_id', Number(category))
+  }
+
+  if (filter) {
+    switch (filter) {
+      case 'lastst':
+        query = query.order('created_at', { ascending: false })
+        break
+      case 'expensive':
+        query = query.order('price', { ascending: false })
+        break
+      case 'cheap':
+        query = query.order('price', { ascending: true })
+        break
+    }
   }
 
   const { data, count, error } = await query
@@ -43,9 +58,6 @@ export async function GET(request: NextRequest) {
   let result = {
     product: data,
     total: count
-  }
-  if (count) {
-    data.total = count
   }
 
   return NextResponse.json(result, OK)
