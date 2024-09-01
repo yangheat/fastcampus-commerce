@@ -1,7 +1,12 @@
 'use client'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { Pagination, SegmentedControl, Select } from '@mantine/core'
+import {
+  ComboboxItem,
+  Pagination,
+  SegmentedControl,
+  Select
+} from '@mantine/core'
 import { CATEGORY_MAP, FILTERS, TAKE } from '@/app/constants/products'
 import PostList from './components/PostLIST'
 
@@ -17,7 +22,7 @@ export default function Page() {
   const [activePage, setPage] = useState(1)
   const [totalPage, setTotalPage] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<String | null>(null)
+  const [filter, setFilter] = useState<ComboboxItem | null>(FILTERS[0])
 
   /** 페이징 계산식
    * start: (n-1) * 9
@@ -35,8 +40,8 @@ export default function Page() {
       url += `&category=${categoryIndex + 1}`
     }
 
-    if (filter) {
-      url += `&filter=${filter}`
+    if (filter?.value) {
+      url += `&filter=${filter.value}`
     }
 
     axios
@@ -64,7 +69,8 @@ export default function Page() {
         <Select
           placeholder="Filter"
           data={FILTERS}
-          onChange={setFilter}
+          value={filter ? filter.value : null}
+          onChange={(_value, option) => setFilter(option)}
           clearable
         />
       </section>
