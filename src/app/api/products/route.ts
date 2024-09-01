@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getProductOrderBy } from '@/app/constants/products'
 
 const BAD_REQUEST = { status: 400 }
 const OK = { status: 200 }
@@ -35,17 +36,8 @@ export async function GET(request: NextRequest) {
   }
 
   if (filter) {
-    switch (filter) {
-      case 'lastst':
-        query = query.order('created_at', { ascending: false })
-        break
-      case 'expensive':
-        query = query.order('price', { ascending: false })
-        break
-      case 'cheap':
-        query = query.order('price', { ascending: true })
-        break
-    }
+    const { column, ascending } = getProductOrderBy(filter)
+    query = query.order(column, ascending)
   }
 
   const { data, count, error } = await query
