@@ -9,17 +9,20 @@ export const FILTERS = [
 ]
 
 export const getProductOrderBy = (category: String) => {
-  let column = 'lastst'
-  let ascending = false
+  let column: string = ''
+  let ascending: boolean = true
 
   switch (category) {
+    case 'lastst':
+      column = 'created_at'
+      ascending = false
+      break
     case 'expensive':
       column = 'price'
       ascending = false
       break
     case 'cheap':
       column = 'price'
-      ascending = true
       break
   }
 
