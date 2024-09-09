@@ -1,11 +1,6 @@
 import { CATEGORY_MAP } from '@/app/constants/products'
 import Image from 'next/image'
-
-type PRODUCT = {
-  id: number
-  price: number
-  category_id: number
-}
+import { PRODUCT } from '../types/product.types'
 
 export default function PostList({
   products,
@@ -19,7 +14,7 @@ export default function PostList({
       {loading ? (
         <p>Loading...</p>
       ) : (
-        products.map(({ id, price, category_id }: PRODUCT) => (
+        products.map(({ id, name, price, category_id }: PRODUCT) => (
           <div key={id} className="justify-self-center">
             <Image
               className="rounded"
@@ -31,7 +26,7 @@ export default function PostList({
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
             />
             <div className="flex justify-between">
-              <span>{id}</span>
+              <span>{name}</span>
               <span>{price}원</span>
             </div>
             <span className="text-zinc-400">

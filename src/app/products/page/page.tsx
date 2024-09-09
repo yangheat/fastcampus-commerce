@@ -9,12 +9,7 @@ import {
 } from '@mantine/core'
 import { CATEGORY_MAP, FILTERS, TAKE } from '@/app/constants/products'
 import PostList from './components/PostLIST'
-
-type PRODUCT = {
-  id: number
-  price: number
-  category_id: number
-}
+import { PRODUCT } from './types/product.types'
 
 export default function Page() {
   const [category, setCategory] = useState('All')
