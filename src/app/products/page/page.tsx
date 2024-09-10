@@ -23,44 +23,52 @@ export default function Page() {
   const [search, setSearch] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
 
-  /** 페이징 계산식
-   * start: (n-1) * 9
-   * end: n * 8 + (n-1)
-   */
+  async function fetchProducts() {
+    function getQueryParams() {
+      /** 페이징 계산식
+       * start: (n-1) * 9
+       * end: n * 8 + (n-1)
+       */
+      const start = (activePage - 1) * TAKE
+      const end = activePage * (TAKE - 1) + (activePage - 1)
+      const categoryIndex = CATEGORY_MAP.indexOf(category)
+
+      let result: string = `?start=${start}&end=${end}`
+
+      if (categoryIndex !== -1) {
+        result += `&category=${categoryIndex + 1}`
+      }
+
+      if (filter?.value) {
+        result += `&filter=${filter.value}`
+      }
+
+      if (searchTerm) {
+        result += `&search=${searchTerm}`
+      }
+
+      return result
+    }
+
+    try {
+      const response = await axios.get('/api/products' + getQueryParams())
+      const data = response.data
+      setProducts(data.product)
+      setTotalPage(Math.ceil(data.total / TAKE))
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const start = (activePage - 1) * TAKE
-    const end = activePage * (TAKE - 1) + (activePage - 1)
-    const categoryIndex = CATEGORY_MAP.indexOf(category)
-
-    let url = `/api/products?start=${start}&end=${end}`
-
-    setLoading(true)
-    if (categoryIndex !== -1) {
-      url += `&category=${categoryIndex + 1}`
+    async function loadProducts() {
+      setLoading(true)
+      fetchProducts()
     }
 
-    if (filter?.value) {
-      url += `&filter=${filter.value}`
-    }
-
-    if (searchTerm) {
-      url += `&search=${searchTerm}`
-    }
-
-    setProducts([])
-    setTotalPage(0)
-    setLoading(false)
-
-    console.log(url)
-    // axios
-    //   .get(url)
-    //   .then((result) => {
-    //     const data = result.data
-    //     setProducts(data.product)
-    //     setTotalPage(Math.ceil(data.total / TAKE))
-    //     setLoading(false)
-    //   })
-    //   .catch((error) => console.error(error))
+    loadProducts()
   }, [activePage, category, filter, searchTerm])
 
   return (
