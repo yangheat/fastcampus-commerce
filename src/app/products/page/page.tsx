@@ -9,7 +9,7 @@ import {
   Select
 } from '@mantine/core'
 import { CATEGORY_MAP, FILTERS, TAKE } from '@/app/constants/products'
-import PostList from './components/PostLIST'
+import PostList from './components/PostList'
 import { IconSearch } from '@tabler/icons-react'
 import { PRODUCT } from './types/product.types'
 
@@ -51,15 +51,16 @@ export default function Page() {
     setTotalPage(0)
     setLoading(false)
 
-    axios
-      .get(url)
-      .then((result) => {
-        const data = result.data
-        setProducts(data.product)
-        setTotalPage(Math.ceil(data.total / TAKE))
-        setLoading(false)
-      })
-      .catch((error) => console.error(error))
+    console.log(url)
+    // axios
+    //   .get(url)
+    //   .then((result) => {
+    //     const data = result.data
+    //     setProducts(data.product)
+    //     setTotalPage(Math.ceil(data.total / TAKE))
+    //     setLoading(false)
+    //   })
+    //   .catch((error) => console.error(error))
   }, [activePage, category, filter, searchTerm])
 
   return (
