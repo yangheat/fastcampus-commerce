@@ -11,64 +11,18 @@ import {
 import { CATEGORY_MAP, FILTERS, TAKE } from '@/app/constants/products'
 import PostList from './components/PostList'
 import { IconSearch } from '@tabler/icons-react'
-import { PRODUCT } from './types/product.types'
+import { useProductSearch } from './hooks/useProductSearch'
 
 export default function Page() {
   const [category, setCategory] = useState('All')
-  const [products, setProducts] = useState<PRODUCT[]>([])
   const [activePage, setPage] = useState(1)
-  const [totalPage, setTotalPage] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<ComboboxItem | null>(FILTERS[0])
   const [search, setSearch] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-
-  async function fetchProducts() {
-    function getQueryParams() {
-      /** 페이징 계산식
-       * start: (n-1) * 9
-       * end: n * 8 + (n-1)
-       */
-      const start = (activePage - 1) * TAKE
-      const end = activePage * (TAKE - 1) + (activePage - 1)
-      const categoryIndex = CATEGORY_MAP.indexOf(category)
-
-      let result: string = `?start=${start}&end=${end}`
-
-      if (categoryIndex !== -1) {
-        result += `&category=${categoryIndex + 1}`
-      }
-
-      if (filter?.value) {
-        result += `&filter=${filter.value}`
-      }
-
-      if (searchTerm) {
-        result += `&search=${searchTerm}`
-      }
-
-      return result
-    }
-
-    try {
-      const response = await axios.get('/api/products' + getQueryParams())
-      const data = response.data
-      setProducts(data.product)
-      setTotalPage(Math.ceil(data.total / TAKE))
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { state, fetchProduct } = useProductSearch()
 
   useEffect(() => {
-    async function loadProducts() {
-      setLoading(true)
-      fetchProducts()
-    }
-
-    loadProducts()
+    fetchProduct(activePage, category, filter, searchTerm)
   }, [activePage, category, filter, searchTerm])
 
   return (
@@ -113,13 +67,13 @@ export default function Page() {
           />
         </section>
       </section>
-      <PostList products={products} loading={loading} />
+      <PostList products={state.products} loading={state.loading} />
       <section className="flex mt-5">
         <Pagination
           className="m-auto"
           value={activePage}
           onChange={setPage}
-          total={totalPage}
+          total={state.totalPage}
         />
       </section>
     </main>
