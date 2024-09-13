@@ -12,48 +12,49 @@ import { CATEGORY_MAP, FILTERS, TAKE } from '@/app/constants/products'
 import PostList from './components/PostList'
 import { IconSearch } from '@tabler/icons-react'
 import { useProductSearch } from './hooks/useProductSearch'
+import { useFilter } from './hooks/useFilter'
 
 export default function Page() {
-  const [category, setCategory] = useState('All')
   const [activePage, setPage] = useState(1)
-  const [filter, setFilter] = useState<ComboboxItem | null>(FILTERS[0])
   const [search, setSearch] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
+  const { filter, setFilter } = useFilter()
   const { state, fetchProduct } = useProductSearch()
 
   useEffect(() => {
-    fetchProduct(activePage, category, filter, searchTerm)
-  }, [activePage, category, filter, searchTerm])
+    fetchProduct(activePage, filter)
+  }, [activePage, filter, fetchProduct])
 
   return (
     <main className="my-32">
       <section>
         <section className="flex justify-between mx-5">
           <SegmentedControl
-            value={category}
+            value={filter.segment}
             onChange={(curr) => {
               setPage(1)
-              setCategory(curr)
+              setFilter({ type: 'SEGMENT', segment: curr })
             }}
             data={['All', ...CATEGORY_MAP]}
           />
           <Select
             placeholder="Filter"
             data={FILTERS}
-            value={filter ? filter.value : null}
-            onChange={(_value, option) => setFilter(option)}
+            value={filter.select.value}
+            onChange={(_value, option) =>
+              setFilter({ type: 'SELECT', select: option })
+            }
             clearable
           />
         </section>
         <section className="mx-5">
           <Input
             value={search}
-            onChange={(event: { currentTarget: { value: any } }) =>
+            onChange={(event: { currentTarget: { value: string } }) =>
               setSearch(event.currentTarget.value)
             }
             onKeyDown={(event: { key: string }) => {
               if (event.key === 'Enter') {
-                setSearchTerm(search)
+                setFilter({ type: 'SEARCH', search })
               }
             }}
             rightSectionPointerEvents="all"
@@ -61,7 +62,7 @@ export default function Page() {
               <IconSearch
                 className="cursor-pointer"
                 size={16}
-                onClick={() => setSearchTerm(search)}
+                onClick={() => setFilter({ type: 'SEARCH', search })}
               />
             }
           />

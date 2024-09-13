@@ -51,9 +51,11 @@ export function useProductSearch() {
   const fetchProduct = useCallback(
     async (
       activePage: number,
-      category: string,
-      filter: ComboboxItem | null,
-      searchTerm: string
+      filter: {
+        segment: string
+        select: { value: string }
+        search: string
+      }
     ) => {
       dispatch({ type: 'FETCH_START' })
 
@@ -64,12 +66,12 @@ export function useProductSearch() {
          */
         const start = (activePage - 1) * TAKE
         const end = activePage * (TAKE - 1) + (activePage - 1)
-        const categoryIndex = CATEGORY_MAP.indexOf(category)
+        const categoryIndex = CATEGORY_MAP.indexOf(filter.segment)
 
         let url: string = `/api/products?start=${start}&end=${end}`
         if (categoryIndex !== -1) url += `&category=${categoryIndex + 1}`
-        if (filter?.value) url += `&filter=${filter.value}`
-        if (searchTerm) url += `&search=${searchTerm}`
+        if (filter.select?.value) url += `&filter=${filter.select.value}`
+        if (filter.search) url += `&search=${filter.search}`
 
         const response = await axios.get(url)
         const data = response.data
