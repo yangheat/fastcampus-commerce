@@ -1,6 +1,6 @@
 import { FILTERS } from '@/app/constants/products'
 import { ComboboxItem } from '@mantine/core'
-import { useReducer } from 'react'
+import { ChangeEvent, useCallback, useReducer, useState } from 'react'
 
 type FILTER_STATE = {
   segment: string
@@ -34,6 +34,46 @@ function filterReducer(state: FILTER_STATE, action: FILTER_ACTION) {
 
 export function useFilter() {
   const [state, dispatch] = useReducer(filterReducer, initialFilter)
+  const [search, setSearch] = useState('')
 
-  return { filter: state, setFilter: dispatch }
+  const handleSegmentFilterChange = useCallback((segment: string) => {
+    dispatch({ type: 'SEGMENT', segment })
+  }, [])
+
+  const handleSelectFilterChange = useCallback(
+    (_value: string | null, option: ComboboxItem) => {
+      dispatch({ type: 'SELECT', select: option })
+    },
+    []
+  )
+
+  const handleSearchChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.currentTarget.value)
+    },
+    []
+  )
+
+  const handleSearchIconClick = () => {
+    dispatch({ type: 'SEARCH', search })
+  }
+
+  const handleSearchFilterChange = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        dispatch({ type: 'SEARCH', search })
+      }
+    },
+    [search]
+  )
+
+  return {
+    filter: state,
+    search,
+    handleSegmentFilterChange,
+    handleSelectFilterChange,
+    handleSearchChange,
+    handleSearchFilterChange,
+    handleSearchIconClick
+  }
 }

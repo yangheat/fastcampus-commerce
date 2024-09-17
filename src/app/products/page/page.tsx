@@ -1,6 +1,6 @@
 'use client'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
+
+import { useCallback, useEffect, useState } from 'react'
 import {
   ComboboxItem,
   Input,
@@ -8,7 +8,7 @@ import {
   SegmentedControl,
   Select
 } from '@mantine/core'
-import { CATEGORY_MAP, FILTERS, TAKE } from '@/app/constants/products'
+import { CATEGORY_MAP, FILTERS } from '@/app/constants/products'
 import PostList from './components/PostList'
 import { IconSearch } from '@tabler/icons-react'
 import { useProductSearch } from './hooks/useProductSearch'
@@ -16,9 +16,16 @@ import { useFilter } from './hooks/useFilter'
 
 export default function Page() {
   const [activePage, setPage] = useState(1)
-  const [search, setSearch] = useState('')
-  const { filter, setFilter } = useFilter()
   const { state, fetchProduct } = useProductSearch()
+  const {
+    filter,
+    search,
+    handleSegmentFilterChange,
+    handleSelectFilterChange,
+    handleSearchChange,
+    handleSearchFilterChange,
+    handleSearchIconClick
+  } = useFilter()
 
   useEffect(() => {
     fetchProduct(activePage, filter)
@@ -26,56 +33,51 @@ export default function Page() {
 
   return (
     <main className="my-32">
-      <section>
+      <section className="space-y-4">
         <section className="flex justify-between mx-5">
           <SegmentedControl
             value={filter.segment}
-            onChange={(curr) => {
-              setPage(1)
-              setFilter({ type: 'SEGMENT', segment: curr })
-            }}
+            onChange={handleSegmentFilterChange}
             data={['All', ...CATEGORY_MAP]}
+            aria-label="Category filter"
           />
           <Select
             placeholder="Filter"
             data={FILTERS}
             value={filter.select.value}
-            onChange={(_value, option) =>
-              setFilter({ type: 'SELECT', select: option })
-            }
+            onChange={handleSelectFilterChange}
             clearable
+            aria-label="Select filter"
           />
         </section>
         <section className="mx-5">
           <Input
             value={search}
-            onChange={(event: { currentTarget: { value: string } }) =>
-              setSearch(event.currentTarget.value)
-            }
-            onKeyDown={(event: { key: string }) => {
-              if (event.key === 'Enter') {
-                setFilter({ type: 'SEARCH', search })
-              }
-            }}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchFilterChange}
             rightSectionPointerEvents="all"
             rightSection={
               <IconSearch
                 className="cursor-pointer"
                 size={16}
-                onClick={() => setFilter({ type: 'SEARCH', search })}
+                onClick={handleSearchIconClick}
+                aria-label="Search button"
               />
             }
+            placeholder="Search products"
+            aria-label="Search input box"
           />
         </section>
-      </section>
-      <PostList products={state.products} loading={state.loading} />
-      <section className="flex mt-5">
-        <Pagination
-          className="m-auto"
-          value={activePage}
-          onChange={setPage}
-          total={state.totalPage}
-        />
+        <PostList products={state.products} loading={state.loading} />
+        <section className="flex">
+          <Pagination
+            className="m-auto"
+            value={activePage}
+            onChange={setPage}
+            total={state.totalPage}
+            aria-label="Page navigation"
+          />
+        </section>
       </section>
     </main>
   )
