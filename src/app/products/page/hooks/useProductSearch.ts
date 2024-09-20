@@ -54,7 +54,7 @@ export function useProductSearch() {
       filter: {
         segment: string
         select: { value: string }
-        search: string
+        keyword: string
       }
     ) => {
       dispatch({ type: 'FETCH_START' })
@@ -71,7 +71,7 @@ export function useProductSearch() {
         let url: string = `/api/products?start=${start}&end=${end}`
         if (categoryIndex !== -1) url += `&category=${categoryIndex + 1}`
         if (filter.select?.value) url += `&filter=${filter.select.value}`
-        if (filter.search) url += `&search=${filter.search}`
+        if (filter.keyword) url += `&keyword=${filter.keyword}`
 
         const response = await axios.get(url)
         const data = response.data

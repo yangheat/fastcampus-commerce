@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const end = searchParams.get('end')
   const category = searchParams.get('category')
   const filter = searchParams.get('filter')
-  const search = searchParams.get('search')
+  const keyword = searchParams.get('keyword')
 
   const PRODUCTS = supabase.from('products')
   let query
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
     query = query.order(column, ascending)
   }
 
-  if (search) {
-    query = query.ilike('name', `%${search}%`)
+  if (keyword) {
+    query = query.ilike('name', `%${keyword}%`)
   }
 
   const { data, count, error } = await query

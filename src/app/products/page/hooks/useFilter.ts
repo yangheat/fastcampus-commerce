@@ -1,22 +1,23 @@
 import { FILTERS } from '@/app/constants/products'
 import { ComboboxItem } from '@mantine/core'
 import { ChangeEvent, useCallback, useReducer, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 
 type FILTER_STATE = {
   segment: string
   select: ComboboxItem
-  search: string
+  keyword: string
 }
 
 type FILTER_ACTION =
   | { type: 'SEGMENT'; segment: string }
   | { type: 'SELECT'; select: ComboboxItem }
-  | { type: 'SEARCH'; search: string }
+  | { type: 'KEYWORD'; keyword: string }
 
 const initialFilter: FILTER_STATE = {
   segment: 'All',
   select: FILTERS[0],
-  search: ''
+  keyword: ''
 }
 
 function filterReducer(state: FILTER_STATE, action: FILTER_ACTION) {
@@ -25,8 +26,8 @@ function filterReducer(state: FILTER_STATE, action: FILTER_ACTION) {
       return { ...state, segment: action.segment }
     case 'SELECT':
       return { ...state, select: action.select }
-    case 'SEARCH':
-      return { ...state, search: action.search }
+    case 'KEYWORD':
+      return { ...state, keyword: action.keyword }
     default:
       return state
   }
@@ -34,7 +35,10 @@ function filterReducer(state: FILTER_STATE, action: FILTER_ACTION) {
 
 export function useFilter() {
   const [state, dispatch] = useReducer(filterReducer, initialFilter)
-  const [search, setSearch] = useState('')
+
+  const debounceKeywordDispatch = useDebouncedCallback((value: string) => {
+    dispatch({ type: 'KEYWORD', keyword: value })
+  }, 1000)
 
   const handleSegmentFilterChange = useCallback((segment: string) => {
     dispatch({ type: 'SEGMENT', segment })
@@ -47,33 +51,17 @@ export function useFilter() {
     []
   )
 
-  const handleSearchChange = useCallback(
+  const handleKeywordChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      setSearch(event.currentTarget.value)
+      debounceKeywordDispatch(event.currentTarget.value)
     },
-    []
-  )
-
-  const handleSearchIconClick = () => {
-    dispatch({ type: 'SEARCH', search })
-  }
-
-  const handleSearchFilterChange = useCallback(
-    (event: React.KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        dispatch({ type: 'SEARCH', search })
-      }
-    },
-    [search]
+    [debounceKeywordDispatch]
   )
 
   return {
     filter: state,
-    search,
     handleSegmentFilterChange,
     handleSelectFilterChange,
-    handleSearchChange,
-    handleSearchFilterChange,
-    handleSearchIconClick
+    handleKeywordChange
   }
 }

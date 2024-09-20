@@ -1,13 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import {
-  ComboboxItem,
-  Input,
-  Pagination,
-  SegmentedControl,
-  Select
-} from '@mantine/core'
+import { useEffect, useState } from 'react'
+import { Input, Pagination, SegmentedControl, Select } from '@mantine/core'
 import { CATEGORY_MAP, FILTERS } from '@/app/constants/products'
 import PostList from './components/PostList'
 import { IconSearch } from '@tabler/icons-react'
@@ -19,12 +13,9 @@ export default function Page() {
   const { state, fetchProduct } = useProductSearch()
   const {
     filter,
-    search,
     handleSegmentFilterChange,
     handleSelectFilterChange,
-    handleSearchChange,
-    handleSearchFilterChange,
-    handleSearchIconClick
+    handleKeywordChange
   } = useFilter()
 
   useEffect(() => {
@@ -52,15 +43,11 @@ export default function Page() {
         </section>
         <section className="mx-5">
           <Input
-            value={search}
-            onChange={handleSearchChange}
-            onKeyDown={handleSearchFilterChange}
-            rightSectionPointerEvents="all"
-            rightSection={
+            onChange={handleKeywordChange}
+            leftSection={
               <IconSearch
                 className="cursor-pointer"
                 size={16}
-                onClick={handleSearchIconClick}
                 aria-label="Search button"
               />
             }
