@@ -1,7 +1,7 @@
 import { FILTERS } from '@/app/constants/products'
+import useDebouncedCallback from '@/app/hooks/useDebouncedCallback'
 import { ComboboxItem } from '@mantine/core'
-import { ChangeEvent, useCallback, useReducer, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
+import { ChangeEvent, useCallback, useReducer } from 'react'
 
 type FILTER_STATE = {
   segment: string
@@ -36,8 +36,8 @@ function filterReducer(state: FILTER_STATE, action: FILTER_ACTION) {
 export function useFilter() {
   const [state, dispatch] = useReducer(filterReducer, initialFilter)
 
-  const debounceKeywordDispatch = useDebouncedCallback((value: string) => {
-    dispatch({ type: 'KEYWORD', keyword: value })
+  const debounceKeywordDispatch = useDebouncedCallback((keyword: string) => {
+    dispatch({ type: 'KEYWORD', keyword })
   }, 1000)
 
   const handleSegmentFilterChange = useCallback((segment: string) => {
